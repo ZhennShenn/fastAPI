@@ -11,9 +11,11 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import ResponseValidationError
 from fastapi.responses import JSONResponse
 
-from auth.auth import auth_backend
-from auth.manage import get_user_manager
-from auth.schemas import UserRead, UserCreate
+from src.auth.base_config import auth_backend
+from src.auth.manager import get_user_manager
+from src.auth.schemas import UserRead, UserCreate
+
+from src.operations.routers import router as router_operation
 
 
 class User:
@@ -43,6 +45,8 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+
+app.include_router(router_operation)
 
 
 @app.exception_handler(ResponseValidationError)
