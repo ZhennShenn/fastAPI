@@ -3,8 +3,12 @@ from enum import Enum
 from typing import List, Optional
 
 from fastapi import FastAPI, Depends
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from fastapi_users import fastapi_users, FastAPIUsers
 from pydantic import BaseModel, Field
+
+from redis import asyncio as aioredis
 
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
@@ -47,6 +51,12 @@ app.include_router(
 )
 
 app.include_router(router_operation)
+
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 @app.exception_handler(ResponseValidationError)
